@@ -29,8 +29,7 @@ function App() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [email, setEmail] = useState(null);
-  const [confirmImage, setConfirmImage] = useState("");
-  const [confirmTitle, setConfirmTitle] = useState("");
+  const [infoToolTipData, setInfoToolTipData] = useState({image:'', text:''}) 
   const [infoTooltip, setInfoTooltip] = useState(false);
 
   function onLogin(email, password) {
@@ -43,8 +42,7 @@ function App() {
         navigate("/");
       })
       .catch(() => {
-        setConfirmImage(Fail);
-        setConfirmTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        setInfoToolTipData({image: Fail, text:'Что-то пошло не так! Попробуйте ещё раз.' })
         setInfoTooltip(true);
       });
   }
@@ -53,13 +51,11 @@ function App() {
     auth
       .registerNewUser(email, password)
       .then(() => {
-        setConfirmImage(Success);
-        setConfirmTitle("Вы успешно зарегистрировались!");
+        setInfoToolTipData({image: Success, text:'Вы успешно зарегистрировались!' })
         navigate("/sign-in");
       })
       .catch(() => {
-        setConfirmImage(Fail);
-        setConfirmTitle("Что-то пошло не так! Попробуйте ещё раз.");
+        setInfoToolTipData({image: Fail, text:'Что-то пошло не так! Попробуйте ещё раз.' })
       })
       .finally(() => {
         setInfoTooltip(true);
@@ -116,28 +112,6 @@ function App() {
     setInfoTooltip(false);
     setSelectedCard({});
   }
-
-  useEffect(() => {
-    api
-      .getUserData()
-      .then((profileInfo) => setCurrentUser(profileInfo))
-      .catch((err) => console.log(err));
-
-    api
-      .getInitialCards()
-      .then((data) => {
-        setCards(
-          data.map((card) => ({
-            _id: card._id,
-            name: card.name,
-            link: card.link,
-            likes: card.likes,
-            owner: card.owner,
-          }))
-        );
-      })
-      .catch((err) => console.log(err));
-  }, []);
 
   function handleCardLike(card) {
     const isLiked = card.likes.some((el) => el._id === currentUser._id);
@@ -270,8 +244,7 @@ function App() {
           />
 
           <InfoTooltip
-            image={confirmImage}
-            title={confirmTitle}
+            data={infoToolTipData}
             isOpen={infoTooltip}
             onClose={closeAllPopups}
           />
